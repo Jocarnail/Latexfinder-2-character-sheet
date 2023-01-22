@@ -26,11 +26,11 @@
 \newtoggle{Str}
 \newcounter{Str}
 % \setcounter{Str}{\value{MStr}*2+10}
-\newcounter{MDes}
-\setcounter{MDes}{0}
-\newtoggle{Des}
-\newcounter{Des}
-% \setcounter{Des}{\value{MDes}*2+10}
+\newcounter{MDex}
+\setcounter{MDex}{0}
+\newtoggle{Dex}
+\newcounter{Dex}
+% \setcounter{Dex}{\value{MDex}*2+10}
 \newcounter{MCos}
 \setcounter{MCos}{0}
 \newtoggle{Cos}
@@ -41,16 +41,16 @@
 \newtoggle{Int}
 \newcounter{Int}
 % \setcounter{Int}{\value{MInt}*2+10}
-\newcounter{MSag}
-\setcounter{MSag}{0}
-\newtoggle{Sag}
-\newcounter{Sag}
-% \setcounter{Sag}{\value{MSag}*2+10}
-\newcounter{MCar}
-\setcounter{MCar}{0}
-\newtoggle{Car}
-\newcounter{Car}
-% \setcounter{Car}{\value{MCar}*2+10}
+\newcounter{MWis}
+\setcounter{MWis}{0}
+\newtoggle{Wis}
+\newcounter{Wis}
+% \setcounter{Wis}{\value{MWis}*2+10}
+\newcounter{MCha}
+\setcounter{MCha}{0}
+\newtoggle{Cha}
+\newcounter{Cha}
+% \setcounter{Cha}{\value{MCha}*2+10}
 
 \newcommand{\ASI}[2]{
     \ifnum \value{#1}<4 {%
@@ -410,8 +410,8 @@
         \setcounter{MStr}{#1}
         \setcounter{Str}{\value{MStr}*2+10}},
     character/dexterity/.code = {%
-        \setcounter{MDes}{#1}
-        \setcounter{Des}{\value{MDes}*2+10}},
+        \setcounter{MDex}{#1}
+        \setcounter{Dex}{\value{MDex}*2+10}},
     character/constitution/.code = {%
         \setcounter{MCos}{#1}
         \setcounter{Cos}{\value{MCos}*2+10}},
@@ -419,32 +419,32 @@
         \setcounter{MInt}{#1}
         \setcounter{Int}{\value{MInt}*2+10}},
     character/wisdom/.code = {%
-        \setcounter{MSag}{#1}
-        \setcounter{Sag}{\value{MSag}*2+10}},
+        \setcounter{MWis}{#1}
+        \setcounter{Wis}{\value{MWis}*2+10}},
     character/charisma/.code = {%
-        \setcounter{MCar}{#1}
-        \setcounter{Car}{\value{MCar}*2+10}},
+        \setcounter{MCha}{#1}
+        \setcounter{Cha}{\value{MCha}*2+10}},
 }
 
 \pgfkeys{character/asi/.is choice,
     character/asi/.cd,
     strength/.code = \ASI{MStr}{Str},
-    dexterity/.code = \ASI{MDes}{Des},
+    dexterity/.code = \ASI{MDex}{Dex},
     constitution/.code = \ASI{MCos}{Cos},
     intelligence/.code = \ASI{MInt}{Int},
-    wisdom/.code = \ASI{MSag}{Sag},
-    charisma/.code = \ASI{MCar}{Car}
+    wisdom/.code = \ASI{MWis}{Wis},
+    charisma/.code = \ASI{MCha}{Cha}
 }
 
 \pgfkeys{
     character/key/.is choice,
     character/key/.cd,
     strength/.code = \setcounter{ClassKey}{\value{MStr}},
-    dexterity/.code = \setcounter{ClassKey}{\value{MDes}},
+    dexterity/.code = \setcounter{ClassKey}{\value{MDex}},
     constitution/.code = \setcounter{ClassKey}{\value{MCos}},
     intelligence/.code = \setcounter{ClassKey}{\value{MInt}},
-    wisdom/.code = \setcounter{ClassKey}{\value{MSag}},
-    charisma/.code = \setcounter{ClassKey}{\value{MCar}}
+    wisdom/.code = \setcounter{ClassKey}{\value{MWis}},
+    charisma/.code = \setcounter{ClassKey}{\value{MCha}}
 }
 
 \pgfkeys{
@@ -603,11 +603,11 @@
     is finesse/.code = \setbool{WeaponIisFinesse}{true},
     key ability score/.is choice,
     key ability score/strength/.code = \setcounter{WeaponIKey}{\value{MStr}},
-    key ability score/dexterity/.code = \setcounter{WeaponIKey}{\value{MDes}},
+    key ability score/dexterity/.code = \setcounter{WeaponIKey}{\value{MDex}},
     key ability score/constitution/.code = \setcounter{WeaponIKey}{\value{MCos}},
     key ability score/intelligence/.code = \setcounter{WeaponIKey}{\value{MInt}},
-    key ability score/wisdom/.code = \setcounter{WeaponIKey}{\value{MSag}},
-    key ability score/charisma/.code = \setcounter{WeaponIKey}{\value{MCar}},
+    key ability score/wisdom/.code = \setcounter{WeaponIKey}{\value{MWis}},
+    key ability score/charisma/.code = \setcounter{WeaponIKey}{\value{MCha}},
     damage type/.store in = \WeaponIDmgType,
     wspec/.code = \setbool{WeaponIWSpec}{true}
 }
@@ -625,11 +625,11 @@
     is finesse/.code = \setbool{WeaponIIisFinesse}{true},
     key ability score/.is choice,
     key ability score/strength/.code = \setcounter{WeaponIIKey}{\value{MStr}},
-    key ability score/dexterity/.code = \setcounter{WeaponIIKey}{\value{MDes}},
+    key ability score/dexterity/.code = \setcounter{WeaponIIKey}{\value{MDex}},
     key ability score/constitution/.code = \setcounter{WeaponIIKey}{\value{MCos}},
     key ability score/intelligence/.code = \setcounter{WeaponIIKey}{\value{MInt}},
-    key ability score/wisdom/.code = \setcounter{WeaponIIKey}{\value{MSag}},
-    key ability score/charisma/.code = \setcounter{WeaponIIKey}{\value{MCar}},
+    key ability score/wisdom/.code = \setcounter{WeaponIIKey}{\value{MWis}},
+    key ability score/charisma/.code = \setcounter{WeaponIIKey}{\value{MCha}},
     damage type/.store in = \WeaponIIDmgType,
     wspec/.code = \setbool{WeaponIIWSpec}{true}
 }
@@ -647,11 +647,11 @@
     is finesse/.code = \setbool{WeaponIIIisFinesse}{true},
     key ability score/.is choice,
     key ability score/strength/.code = \setcounter{WeaponIIIKey}{\value{MStr}},
-    key ability score/dexterity/.code = \setcounter{WeaponIIIKey}{\value{MDes}},
+    key ability score/dexterity/.code = \setcounter{WeaponIIIKey}{\value{MDex}},
     key ability score/constitution/.code = \setcounter{WeaponIIIKey}{\value{MCos}},
     key ability score/intelligence/.code = \setcounter{WeaponIIIKey}{\value{MInt}},
-    key ability score/wisdom/.code = \setcounter{WeaponIIIKey}{\value{MSag}},
-    key ability score/charisma/.code = \setcounter{WeaponIIIKey}{\value{MCar}},
+    key ability score/wisdom/.code = \setcounter{WeaponIIIKey}{\value{MWis}},
+    key ability score/charisma/.code = \setcounter{WeaponIIIKey}{\value{MCha}},
     damage type/.store in = \WeaponIIIDmgType,
     wspec/.code = \setbool{WeaponIIIWSpec}{true}
 }
@@ -670,11 +670,11 @@
     damage special/.code = \setcounter{RangedIDmgSpecial}{#1},
     key ability score/.is choice,
     key ability score/strength/.code = \setcounter{RangedIKey}{\value{MStr}},
-    key ability score/dexterity/.code = \setcounter{RangedIKey}{\value{MDes}},
+    key ability score/dexterity/.code = \setcounter{RangedIKey}{\value{MDex}},
     key ability score/constitution/.code = \setcounter{RangedIKey}{\value{MCos}},
     key ability score/intelligence/.code = \setcounter{RangedIKey}{\value{MInt}},
-    key ability score/wisdom/.code = \setcounter{RangedIKey}{\value{MSag}},
-    key ability score/charisma/.code = \setcounter{RangedIKey}{\value{MCar}},
+    key ability score/wisdom/.code = \setcounter{RangedIKey}{\value{MWis}},
+    key ability score/charisma/.code = \setcounter{RangedIKey}{\value{MCha}},
     damage type/.store in = \RangedIDmgType,
     wspec/.code = \setbool{RangedIWSpec}{true}
 }
@@ -693,11 +693,11 @@
     damage special/.code = \setcounter{RangedIIDmgSpecial}{#1},
     key ability score/.is choice,
     key ability score/strength/.code = \setcounter{RangedIIKey}{\value{MStr}},
-    key ability score/dexterity/.code = \setcounter{RangedIIKey}{\value{MDes}},
+    key ability score/dexterity/.code = \setcounter{RangedIIKey}{\value{MDex}},
     key ability score/constitution/.code = \setcounter{RangedIIKey}{\value{MCos}},
     key ability score/intelligence/.code = \setcounter{RangedIIKey}{\value{MInt}},
-    key ability score/wisdom/.code = \setcounter{RangedIIKey}{\value{MSag}},
-    key ability score/charisma/.code = \setcounter{RangedIIKey}{\value{MCar}},
+    key ability score/wisdom/.code = \setcounter{RangedIIKey}{\value{MWis}},
+    key ability score/charisma/.code = \setcounter{RangedIIKey}{\value{MCha}},
     damage type/.store in = \RangedIIDmgType,
     wspec/.code = \setbool{RangedIIWSpec}{true}
 }
@@ -716,11 +716,11 @@
     damage special/.code = \setcounter{RangedIIIDmgSpecial}{#1},
     key ability score/.is choice,
     key ability score/strength/.code = \setcounter{RangedIIIKey}{\value{MStr}},
-    key ability score/dexterity/.code = \setcounter{RangedIIIKey}{\value{MDes}},
+    key ability score/dexterity/.code = \setcounter{RangedIIIKey}{\value{MDex}},
     key ability score/constitution/.code = \setcounter{RangedIIIKey}{\value{MCos}},
     key ability score/intelligence/.code = \setcounter{RangedIIIKey}{\value{MInt}},
-    key ability score/wisdom/.code = \setcounter{RangedIIIKey}{\value{MSag}},
-    key ability score/charisma/.code = \setcounter{RangedIIIKey}{\value{MCar}},
+    key ability score/wisdom/.code = \setcounter{RangedIIIKey}{\value{MWis}},
+    key ability score/charisma/.code = \setcounter{RangedIIIKey}{\value{MCha}},
     damage type/.store in = \RangedIIIDmgType,
     wspec/.code = \setbool{RangedIIIWSpec}{true}
 }

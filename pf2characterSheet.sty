@@ -133,15 +133,15 @@
 
 %Armor calculator
 \newcommand{\CalculateArmor}{
-	\newcounter{ArmorDes}
+	\newcounter{ArmorDex}
 	
-	\ifnum \value{MDes} < \value{CurrentArmorCap}
-	\setcounter{ArmorDes}{\value{MDes}}
+	\ifnum \value{MDex} < \value{CurrentArmorCap}
+	\setcounter{ArmorDex}{\value{MDex}}
 	\else
-	\setcounter{ArmorDes}{\value{CurrentArmorCap}}
+	\setcounter{ArmorDex}{\value{CurrentArmorCap}}
 	\fi
 	
-	\CalculateTotalCD{CD, key = \value{ArmorDes}, proficiency = \CurrentArmorProf, item = \value{CurrentArmorItemBonus}}
+	\CalculateTotalCD{CD, key = \value{ArmorDex}, proficiency = \CurrentArmorProf, item = \value{CurrentArmorItemBonus}}
 }
 
 % General function — Calculate bonus
@@ -373,9 +373,9 @@
 	]
 	at (0.2965,0.037)
 	{\Large \ifbool{\weaponFinesse}{%
-		\ifnum \value{MDes}>\value{MStr}
-		{\theMDes
-		\setcounter{weaponKey}{\value{MDes}}}
+		\ifnum \value{MDex}>\value{MStr}
+		{\theMDex
+		\setcounter{weaponKey}{\value{MDex}}}
 		\else {\theweaponKey}
 		\fi
 	}{\theweaponKey}};
@@ -668,14 +668,14 @@
             at (0.298, 0.824)
             {\huge\theStr};
             
-            %Des
+            %Dex
             \node[
                 anchor= base,
                 text width = 1cm,
                 align = center
             ]
             at (0.062, 0.787)
-            {\huge\theMDes};
+            {\huge\theMDex};
             
             \node[
                 anchor= base,
@@ -683,7 +683,7 @@
                 align = center
             ]
             at (0.298, 0.788)
-            {\huge\theDes};
+            {\huge\theDex};
             
             %Cos
             \node[
@@ -719,14 +719,14 @@
             at (0.298, 0.718)
             {\huge\theInt};
             
-            %Sag
+            %Wis
             \node[
                 anchor= base,
                 text width = 1cm,
                 align = center
             ]
             at (0.062, 0.6815)
-            {\huge\theMSag};
+            {\huge\theMWis};
             
             \node[
                 anchor= base,
@@ -734,16 +734,16 @@
                 align = center
             ]
             at (0.298, 0.6825)
-            {\huge\theSag};
+            {\huge\theWis};
             
-            %Car
+            %Cha
             \node[
                 anchor= base,
                 text width = 1cm,
                 align = center
             ]
             at (0.062, 0.646)
-            {\huge\theMCar};
+            {\huge\theMCha};
             
             \node[
                 anchor= base,
@@ -751,7 +751,7 @@
                 align = center
             ]
             at (0.298, 0.647)
-            {\huge\theCar};
+            {\huge\theCha};
             
             %ClassDC
             \node[
@@ -799,14 +799,14 @@
             {\huge\CalculateClassDC};
             
             %Armor Class
-            %Des
+            %Dex
             \node[
                 anchor= base,
                 text width = 0.5cm,
                 align = center
             ]
             at (0.52, 0.82)
-            {\Large\theMDes};
+            {\Large\theMDex};
             
             %Cap
             \node[
@@ -927,13 +927,13 @@
             
             %Reflex
             \begin{scope}[shift={(0.498, 0.619)}]
-                \TSBox{\value{MDes}}{\ReflexProf}{\value{ReflexItem}}
+                \TSBox{\value{MDex}}{\ReflexProf}{\value{ReflexItem}}
                 
             \end{scope}
             
             %Will
             \begin{scope}[shift={(0.629, 0.619)}]
-                \TSBox{\value{MSag}}{\WillProf}{\value{WillItem}}
+                \TSBox{\value{MWis}}{\WillProf}{\value{WillItem}}
                 
             \end{scope}
 
@@ -962,7 +962,7 @@
                 align = center
             ]
             at (0.781, 0.674)
-            {\huge\CalculateBonus{\value{MSag}}{\PerceptionProf}{\value{PerceptionItem}}};
+            {\huge\CalculateBonus{\value{MWis}}{\PerceptionProf}{\value{PerceptionItem}}};
 
             \node[
                 anchor= base,
@@ -970,7 +970,7 @@
                 align = center
             ]
             at (0.817, 0.637)
-            {\large\theMSag};
+            {\large\theMWis};
 
             \node[
                 anchor= base,
@@ -1027,13 +1027,13 @@
             \begin{scope}[shift = {(0.525, 0.537)}]
                 \ifbool{ArmorFlexible}{
                     \DrawSkill{skill, 
-                    key = \value{MDes}, 
+                    key = \value{MDex}, 
                     proficiency = \AcrobaticProf,
                     item = \value{AcrobaticItem}
                     }
                 }{
                     \DrawSkill{skill, 
-                    key = \value{MDes}, 
+                    key = \value{MDex}, 
                     proficiency = \AcrobaticProf,
                     item = \value{AcrobaticItem},
                     ArmorPenalty = \value{ArmorPenalty},
@@ -1075,21 +1075,21 @@
 
             \begin{scope}[shift = {(0.525, 0.425)}]
                 \DrawSkill{skill, 
-                key = \value{MCar}, 
+                key = \value{MCha}, 
                 proficiency = \DeceptionProf,
                 item = \value{DeceptionItem}}
             \end{scope}
 
             \begin{scope}[shift = {(0.525, 0.397)}]
                 \DrawSkill{skill, 
-                key = \value{MCar}, 
+                key = \value{MCha}, 
                 proficiency = \DiplomacyProf,
                 item = \value{DiplomacyItem}}
             \end{scope}
 
             \begin{scope}[shift = {(0.525, 0.369)}]
                 \DrawSkill{skill, 
-                key = \value{MCar}, 
+                key = \value{MCha}, 
                 proficiency = \IntimidationProf,
                 item = \value{IntimidationItem}}
             \end{scope}
@@ -1126,14 +1126,14 @@
 
             \begin{scope}[shift = {(0.525, 0.286)}]
                 \DrawSkill{skill, 
-                key = \value{MSag}, 
+                key = \value{MWis}, 
                 proficiency = \MedicineProf,
                 item = \value{MedicineItem}}
             \end{scope}
 
             \begin{scope}[shift = {(0.525, 0.258)}]
                 \DrawSkill{skill, 
-                key = \value{MSag}, 
+                key = \value{MWis}, 
                 proficiency = \NatureProf,
                 item = \value{NatureItem}}
             \end{scope}
@@ -1147,14 +1147,14 @@
 
             \begin{scope}[shift = {(0.525, 0.202)}]
                 \DrawSkill{skill, 
-                key = \value{MCar}, 
+                key = \value{MCha}, 
                 proficiency = \PerformanceProf,
                 item = \value{PerformanceItem}}
             \end{scope}
 
             \begin{scope}[shift = {(0.525, 0.174)}]
                 \DrawSkill{skill, 
-                key = \value{MSag}, 
+                key = \value{MWis}, 
                 proficiency = \ReligionProf,
                 item = \value{ReligionItem}}
             \end{scope}
@@ -1169,7 +1169,7 @@
             \begin{scope}[shift = {(0.525, 0.118)}]
                 \ifbool{ArmorNoisy}{
                     \DrawSkill{skill, 
-                    key = \value{MDes}, 
+                    key = \value{MDex}, 
                     proficiency = \StealthProf,
                     item = \value{StealthItem},
                     haveArmorPenalty = true,
@@ -1177,7 +1177,7 @@
                     }
                 }{
                     \DrawSkill{skill, 
-                    key = \value{MDes}, 
+                    key = \value{MDex}, 
                     proficiency = \StealthProf,
                     item = \value{StealthItem},
                     haveArmorPenalty = true,
@@ -1188,14 +1188,14 @@
 
             \begin{scope}[shift = {(0.525, 0.09)}]
                 \DrawSkill{skill, 
-                key = \value{MSag}, 
+                key = \value{MWis}, 
                 proficiency = \SurvivalProf,
                 item = \value{SurvivalItem}}
             \end{scope}
 
             \begin{scope}[shift = {(0.525, 0.062)}]
                 \DrawSkill{skill, 
-                    key = \value{MDes}, 
+                    key = \value{MDex}, 
                     proficiency = \ThieveryProf,
                     item = \value{ThieveryItem},
                     haveArmorPenalty = true,
