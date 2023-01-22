@@ -1,6 +1,27 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{pf2charactersheet}
 
+\RequirePackage{xparse}
+\ExplSyntaxOn
+    \file_if_exist:nTF {./pf2characterwrapper.sty}
+        {
+            \RequirePackage{./pf2characterwrapper}
+        }
+        {
+            \file_if_exist:nTF {./Latexfinder-2-character-sheet/pf2characterwrapper.sty}
+            {
+                \RequirePackage{./Latexfinder-2-character-sheet/pf2characterwrapper}
+            }
+            {
+            }
+        }
+
+    \file_if_exist:nTF {./Latexfinder-2-character-sheet/CharacterSheetJPG/PZO2101-CharacterSheet-BW_pages-to-jpg-0001.jpg}
+    {\def\chsheetpg1{./Latexfinder-2-character-sheet/CharacterSheetJPG/PZO2101-CharacterSheet-BW_pages-to-jpg-0001.jpg}}
+    {\def\chsheetpg1{./CharacterSheetJPG/PZO2101-CharacterSheet-BW_pages-to-jpg-0001.jpg}
+    }
+\ExplSyntaxOff
+
 \RequirePackage[
     usenames,
     dvipsnames,
@@ -14,7 +35,6 @@
 \RequirePackage{graphicx, float}
 \DeclareGraphicsExtensions{.png,.jpg,.pdf,.jpeg}
 \RequirePackage{adjustbox}
-\RequirePackage{./Latexfinder-2-character-sheet/pf2characterwrapper}
 
 % \RequirePackage{calc}
 
@@ -567,7 +587,7 @@
 \newcommand{\characterSheet}{
     \newgeometry{margin = 0pt}
     \begin{tikzpicture}
-        \node[anchor = south west, inner sep=0] (image) at (0,0) {\includegraphics[width = .97\textwidth]{./Latexfinder-2-character-sheet/CharacterSheetJPG/PZO2101-CharacterSheet-BW_pages-to-jpg-0001.jpg}};
+        \node[anchor = south west, inner sep=0] (image) at (0,0) {\includegraphics[width = .97\textwidth]{\chsheetpg1}};
         
         \begin{scope}[x={(image.south east)}, y={(image.north west)}]
             %Character Name
