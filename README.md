@@ -15,3 +15,11 @@ It is possible to utilize the Latexfinder 2 character sheet either as a local pa
 ```latex
 \usepackage{./Latexfinder-2-character-sheet/pf2characterstyle}
 ```
+> #### **Warnings**
+> 
+> When loaded as a local package, the compilation of the project will throw the following, or similar, warnings:
+> ```latex
+> You have requested package `./Latexfinder-2-character-sheet/pf2charactersheet`, but the package provides `pf2charactersheet`.
+> ```
+>
+> This is expected
