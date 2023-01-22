@@ -1,0 +1,733 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{pf2character}
+
+\RequirePackage{tikz}
+
+
+%%%
+%Number crunching
+%%%
+\newcounter{Level}
+\setcounter{Level}{5}
+
+\def\theCharacterName{}
+\def\thePlayerName{}
+\def\theAnchestry{}
+\def\theBackground{}
+\def\theClass{}
+\def\theSize{}
+\def\theAlignement{}
+\def\theCharacterTraits{}
+\def\theDeity{}
+
+%Scores
+\newcounter{MStr}
+\setcounter{MStr}{0}
+\newtoggle{Str}
+\newcounter{Str}
+% \setcounter{Str}{\value{MStr}*2+10}
+\newcounter{MDes}
+\setcounter{MDes}{0}
+\newtoggle{Des}
+\newcounter{Des}
+% \setcounter{Des}{\value{MDes}*2+10}
+\newcounter{MCos}
+\setcounter{MCos}{0}
+\newtoggle{Cos}
+\newcounter{Cos}
+% \setcounter{Cos}{\value{MCos}*2+10}
+\newcounter{MInt}
+\setcounter{MInt}{0}
+\newtoggle{Int}
+\newcounter{Int}
+% \setcounter{Int}{\value{MInt}*2+10}
+\newcounter{MSag}
+\setcounter{MSag}{0}
+\newtoggle{Sag}
+\newcounter{Sag}
+% \setcounter{Sag}{\value{MSag}*2+10}
+\newcounter{MCar}
+\setcounter{MCar}{0}
+\newtoggle{Car}
+\newcounter{Car}
+% \setcounter{Car}{\value{MCar}*2+10}
+
+\newcommand{\ASI}[2]{
+    \ifnum \value{#1}<4 {%
+        \addtocounter{#1}{1}%
+    }
+    \else {%
+        \iftoggle{#2}{%
+            \global\togglefalse{#2}
+            \addtocounter{#1}{1}%
+            \setcounter{#2}{\value{#1}*2+10}%
+        }{%
+            \global\toggletrue{#2}
+            \setcounter{#2}{\value{#1}*2+11}%
+        }
+    }
+    \fi
+}
+
+
+%ClassDC
+\newcounter{ClassKey}
+% \setcounter{ClassKey}{\value{MInt}}
+\def\ClassProf{T}
+\newcounter{ClassItemBonus}
+% \setcounter{ClassItemBonus}{0}
+
+
+%Current Armor Proficiency
+\newcounter{CurrentArmorCap}
+\setcounter{CurrentArmorCap}{0}
+\def\CurrentArmorProf{}
+\newcounter{CurrentArmorItemBonus}
+\setcounter{CurrentArmorItemBonus}{0}
+
+\newcounter{ShieldBonus}
+\setcounter{ShieldBonus}{0}
+\newcounter{ShieldHard}
+\setcounter{ShieldHard}{0}
+\newcounter{ShieldHP}
+\setcounter{ShieldHP}{0}
+
+\newcounter{BaseArmorPenalty}
+\setcounter{BaseArmorPenalty}{0}
+\newcounter{ArmorStr}
+\setcounter{ArmorStr}{0}
+
+\newcounter{ArmorPenalty}
+% \addtocounter{ArmorStr}{1}
+% \ifnum \value{Str} > \value{ArmorStr}
+% 	\setcounter{ArmorPenalty}{0}
+% \else{
+% 	\setcounter{ArmorPenalty}{\value{BaseArmorPenalty}}
+% }
+% \fi
+
+\newbool{ArmorNoisy}
+\setbool{ArmorNoisy}{false}
+
+\newbool{ArmorFlexible}
+\setbool{ArmorFlexible}{false}
+
+%Proficiency and armor
+\def\UnarmoredProf{}
+\def\LightArmorProf{}
+\def\MediumArmorProf{}
+\def\HeavyArmorProf{}
+
+
+%TS
+\def\FortitudeProf{T}
+\newcounter{FortitudeItem}
+\setcounter{FortitudeItem}{0}
+
+\def\ReflexProf{T}
+\newcounter{ReflexItem}
+\setcounter{ReflexItem}{0}
+
+\def\WillProf{T}
+\newcounter{WillItem}
+\setcounter{WillItem}{0}
+
+%HP
+\newcounter{HPPerLV}
+\setcounter{HPPerLV}{0}
+\newcounter{RaceHP}
+\setcounter{RaceHP}{0}
+\newcounter{BonusHPPerLV}
+\setcounter{BonusHPPerLV}{0}
+\newcounter{BonusHPFlat}
+\setcounter{BonusHPFlat}{0}
+\newcounter{BonusHPItem}
+\setcounter{BonusHPItem}{0}
+
+\newcounter{HPTot}
+\setcounter{HPTot}{
+	(\value{HPPerLV} + \value{MCos} + \value{BonusHPPerLV}) * \value{Level} + \value{RaceHP} + \value{BonusHPFlat} + \value{BonusHPItem}}
+
+%Resistance and Imunity
+\def\Resist{} %Max 29 carachters
+\def\Imune{}
+
+%Perception
+\newcounter{PerceptionItem}
+\setcounter{PerceptionItem}{0}
+\def\PerceptionProf{}
+
+\def\Senses{}
+
+%Speed
+\newcounter{Speed}
+\setcounter{Speed}{0}
+\def\Movement{}
+
+%Skills
+
+\def\AcrobaticProf{T}
+\newcounter{AcrobaticItem}
+\setcounter{AcrobaticItem}{0}
+
+\def\ArcanaProf{}
+\newcounter{ArcanaItem}
+\setcounter{ArcanaItem}{0}
+
+\def\AthleticsProf{T}
+\newcounter{AthleticsItem}
+\setcounter{AthleticsItem}{0}
+
+\def\CraftingProf{E}
+\newcounter{CraftingItem}
+\setcounter{CraftingItem}{0}
+
+\def\DeceptionProf{T}
+\newcounter{DeceptionItem}
+\setcounter{DeceptionItem}{0}
+
+\def\DiplomacyProf{T}
+\newcounter{DiplomacyItem}
+\setcounter{DiplomacyItem}{0}
+
+\def\IntimidationProf{}
+\newcounter{IntimidationItem}
+\setcounter{IntimidationItem}{0}
+
+\def\LoreIProf{T}
+\newcounter{LoreIItem}
+\setcounter{LoreIItem}{0}
+\def\LoreIName{Alcohol}
+
+\def\LoreIIProf{}
+\newcounter{LoreIIItem}
+\setcounter{LoreIIItem}{0}
+\def\LoreIIName{}
+
+\def\MedicineProf{}
+\newcounter{MedicineItem}
+\setcounter{MedicineItem}{0}
+
+\def\NatureProf{}
+\newcounter{NatureItem}
+\setcounter{NatureItem}{0}
+
+\def\OccultismProf{}
+\newcounter{OccultismItem}
+\setcounter{OccultismItem}{0}
+
+\def\PerformanceProf{}
+\newcounter{PerformanceItem}
+\setcounter{PerformanceItem}{0}
+
+\def\ReligionProf{}
+\newcounter{ReligionItem}
+\setcounter{ReligionItem}{0}
+
+\def\SocietyProf{}
+\newcounter{SocietyItem}
+\setcounter{SocietyItem}{0}
+
+\def\StealthProf{}
+\newcounter{StealthItem}
+\setcounter{StealthItem}{0}
+
+\def\SurvivalProf{}
+\newcounter{SurvivalItem}
+\setcounter{SurvivalItem}{0}
+
+\def\ThieveryProf{}
+\newcounter{ThieveryItem}
+\setcounter{ThieveryItem}{0}
+
+%Languages
+\def\Languages{}
+
+%Weapons
+\def\LightWeaponProf{}
+\def\MartialWeaponProf{}
+\def\OtherWeaponIProf{}
+\def\OtherWeaponI{}
+\def\OtherWeaponIIProf{}
+\def\OtherWeaponII{}
+
+%Weapons
+
+%Weapon 1
+\def\WeaponI{}
+\def\WeaponITraits{}
+\def\WeaponIOther{}
+\def\WeaponIDice{}
+\def\WeaponIProf{}
+\newcounter{WeaponIItem}
+\setcounter{WeaponIItem}{0}
+\newbool{WeaponIisFinesse}
+\setbool{WeaponIisFinesse}{false}
+\newcounter{WeaponIKey}
+\setcounter{WeaponIKey}{0}
+
+\def\WeaponIDmgType{}
+
+\newbool{WeaponIWSpec}
+\setbool{WeaponIWSpec}{false}
+
+
+%Weapon 2
+\def\WeaponII{}
+\def\WeaponIITraits{}
+\def\WeaponIIOther{}
+\def\WeaponIIDice{}
+\def\WeaponIIProf{}
+\newcounter{WeaponIIItem}
+\setcounter{WeaponIIItem}{0}
+\newbool{WeaponIIisFinesse}
+\setbool{WeaponIIisFinesse}{false}
+\newcounter{WeaponIIKey}
+\setcounter{WeaponIIKey}{0}
+
+\def\WeaponIIDmgType{}
+
+\newbool{WeaponIIWSpec}
+\setbool{WeaponIIWSpec}{false}
+
+
+%Weapon 3
+\def\WeaponIII{}
+\def\WeaponIIITraits{}
+\def\WeaponIIIOther{}
+\def\WeaponIIIDice{}
+\def\WeaponIIIProf{}
+\newcounter{WeaponIIIItem}
+\setcounter{WeaponIIIItem}{0}
+\newbool{WeaponIIIisFinesse}
+\setbool{WeaponIIIisFinesse}{false}
+\newcounter{WeaponIIIKey}
+\setcounter{WeaponIIIKey}{0}
+
+\def\WeaponIIIDmgType{}
+
+\newbool{WeaponIIIWSpec}
+\setbool{WeaponIIIWSpec}{false}
+
+%Ranged 1
+\def\RangedI{}
+\def\RangedITraits{}
+\def\RangedIOther{}
+\def\RangedIDice{}
+\newcounter{RangedIDmgSpecial}
+\setcounter{RangedIDmgSpecial}{0}
+\def\RangedIDmgType{}
+\def\RangedIProf{}
+\newcounter{RangedIItem}
+\setcounter{RangedIItem}{0}
+\newbool{RangedIisFinesse}
+\setbool{RangedIisFinesse}{false}
+\newcounter{RangedIKey}
+\setcounter{RangedIKey}{0}
+
+
+\newbool{RangedIWSpec}
+\setbool{RangedIWSpec}{false}
+
+%Ranged 2
+\def\RangedII{}
+\def\RangedIITraits{}
+\def\RangedIIOther{}
+\def\RangedIIDice{}
+\newcounter{RangedIIDmgSpecial}
+\setcounter{RangedIIDmgSpecial}{0}
+\def\RangedIIDmgType{}
+\def\RangedIIProf{}
+\newcounter{RangedIIItem}
+\setcounter{RangedIIItem}{0}
+\newbool{RangedIIisFinesse}
+\setbool{RangedIIisFinesse}{false}
+\newcounter{RangedIIKey}
+\setcounter{RangedIIKey}{0}
+
+
+\newbool{RangedIIWSpec}
+\setbool{RangedIIWSpec}{false}
+
+%Ranged 3
+\def\RangedIII{}
+\def\RangedIIITraits{}
+\def\RangedIIIOther{}
+\def\RangedIIIDice{}
+\newcounter{RangedIIIDmgSpecial}
+\setcounter{RangedIIIDmgSpecial}{0}
+\def\RangedIIIProf{}
+\newcounter{RangedIIIItem}
+\setcounter{RangedIIIItem}{0}
+\newbool{RangedIIIisFinesse}
+\setbool{RangedIIIisFinesse}{false}
+\newcounter{RangedIIIKey}
+\setcounter{RangedIIIKey}{0}
+
+\def\RangedIIIDmgType{}
+
+\newbool{RangedIIIWSpec}
+\setbool{RangedIIIWSpec}{false}
+
+\pgfkeys{
+    character/.is family,
+    character/level/.code = \setcounter{Level}{#1}
+}
+
+\pgfkeys{
+    character/.cd,
+    name/.store in = \theCharacterName,
+    player/.store in = \thePlayerName,
+    ancestry/.store in = \theAnchestry,
+    background/.store in = \theBackground,
+    class/.store in = \theClass,
+    size/.store in = \theSize,
+    alignement/.store in = \theAlignement,
+    characterTraits/.store in = \theCharacterTraits,
+    deity/.store in = \theDeity
+}
+
+\pgfkeys{
+    hp/.is family,
+    hp/.cd,
+    per level/.code = \setcounter{HPPerLV}{#1},
+    race/.code = \setcounter{RaceHP}{#1},
+    bonus per level/.code = \setcounter{BonusHPPerLV}{#1},
+    bonus flat/.code = \setcounter{BonusHPFlat}{#1},
+    item/.code = \setcounter{BonusHPItem}{#1}
+}
+
+\pgfkeys{
+    resistances/.store in = \Resist, %Max 29 carachters
+    imunities/.store in = \Imune,
+    speed/.code = \setcounter{Speed}{#1},
+    movement types/.store in = \Movement
+    
+}
+
+\pgfkeys{
+    character/strength/.code = {%
+        \setcounter{MStr}{#1}
+        \setcounter{Str}{\value{MStr}*2+10}},
+    character/dexterity/.code = {%
+        \setcounter{MDes}{#1}
+        \setcounter{Des}{\value{MDes}*2+10}},
+    character/constitution/.code = {%
+        \setcounter{MCos}{#1}
+        \setcounter{Cos}{\value{MCos}*2+10}},
+    character/intelligence/.code = {%
+        \setcounter{MInt}{#1}
+        \setcounter{Int}{\value{MInt}*2+10}},
+    character/wisdom/.code = {%
+        \setcounter{MSag}{#1}
+        \setcounter{Sag}{\value{MSag}*2+10}},
+    character/charisma/.code = {%
+        \setcounter{MCar}{#1}
+        \setcounter{Car}{\value{MCar}*2+10}},
+}
+
+\pgfkeys{character/asi/.is choice,
+    character/asi/.cd,
+    strength/.code = \ASI{MStr}{Str},
+    dexterity/.code = \ASI{MDes}{Des},
+    constitution/.code = \ASI{MCos}{Cos},
+    intelligence/.code = \ASI{MInt}{Int},
+    wisdom/.code = \ASI{MSag}{Sag},
+    charisma/.code = \ASI{MCar}{Car}
+}
+
+\pgfkeys{
+    character/key/.is choice,
+    character/key/.cd,
+    strength/.code = \setcounter{ClassKey}{\value{MStr}},
+    dexterity/.code = \setcounter{ClassKey}{\value{MDes}},
+    constitution/.code = \setcounter{ClassKey}{\value{MCos}},
+    intelligence/.code = \setcounter{ClassKey}{\value{MInt}},
+    wisdom/.code = \setcounter{ClassKey}{\value{MSag}},
+    charisma/.code = \setcounter{ClassKey}{\value{MCar}}
+}
+
+\pgfkeys{
+    character/classProf/.store in = \ClassProf,
+    character/classItemBonus/.code = \setcounter{ClassItemBonus}{#1},
+    character/classItemBonus/.default = 0
+}
+
+\pgfkeys{
+    savingtrows/.is family,
+    savingtrows/.cd,
+    fortitude/.store in = \FortitudeProf,
+    fortitude/item/.code = \setcounter{FortitudeItem}{#1},
+    reflex/.store in = \ReflexProf,
+    reflex/item/.code = \setcounter{ReflexItem}{#1},
+    will/.store in = \WillProf,
+    will/item/.code = \setcounter{WillItem}{#1}
+}
+
+\pgfkeys{
+    perception/.is family,
+    perception/.cd,
+    proficiency/.store in = \PerceptionProf,
+    item/.code = \setcounter{PerceptionItem}{#1},
+    senses/.store in = \Senses,
+    languages/.store in = \Languages
+}
+
+\newcommand{\setCharacter}[1]{
+    \pgfkeys{#1}
+
+    \setcounter{HPTot}{(\value{HPPerLV} + \value{MCos} + \value{BonusHPPerLV}) * \value{Level} + \value{RaceHP} + \value{BonusHPFlat} + \value{BonusHPItem}}
+}
+
+\pgfkeys{
+    armor/.is family,
+    armor/.cd,
+    proficiency/.is family,
+    proficiency/unarmored/.store in = \UnarmoredProf,
+    proficiency/light armor/.store in = \LightArmorProf,
+    proficiency/medium armor/.store in = \MediumArmorProf,
+    proficiency/heavy armor/.store in = \HeavyArmorProf
+}
+
+\pgfkeys{%
+    armor/current/.is family,
+    armor/current/.cd,
+    armorCap/.code = \setcounter{CurrentArmorCap}{#1},
+    proficiency/.store in = \CurrentArmorProf,
+    item bonus/.code = \setcounter{CurrentArmorItemBonus}{#1},
+    armor penalty/.code = \setcounter{BaseArmorPenalty}{#1},
+    strength required/.code = \setcounter{ArmorStr}{#1},
+    trait/.is choice,
+    trait/noisy/.code = \setbool{ArmorNoisy}{true},
+    trait/flexible/.code = \setbool{ArmorFlexible}{true}
+}
+
+\pgfkeys{
+    armor/shield/.is family,
+    armor/shield/.cd,
+    bonus/.code = \setcounter{ShieldBonus}{#1},
+    hardness/.code = \setcounter{ShieldHard}{#1},
+    hp/.code = \setcounter{ShieldHP}{#1}
+}
+
+\newcommand{\setArmor}[1]{
+    \pgfkeys{
+        armor/.cd, 
+        #1
+    }
+
+    \addtocounter{ArmorStr}{-1}
+    \ifnum \value{Str} > \value{ArmorStr}
+        \setcounter{ArmorPenalty}{0}
+    \else{
+        \setcounter{ArmorPenalty}{\value{BaseArmorPenalty}}
+    }
+    \fi
+}
+
+\pgfkeys{
+    skill/.is family,
+    skill/.cd,
+    acrobatics/.store in = \AcrobaticProf,
+    acrobatics/item/.code = \setcounter{AcrobaticItem}{#1},
+    arcana/.store in = \ArcanaProf,
+    arcana/item/.code = \setcounter{ArcanaItem}{#1},
+    athletics/.store in = \AthleticsProf,
+    athletics/item/.code = \setcounter{AthleticsItem}{#1},
+    crafting/.store in = \CraftingProf,
+    crafting/item/.code = \setcounter{CraftingItem}{#1},
+    deception/.store in = \DeceptionProf,
+    deception/item/.code = \setcounter{DeceptionItem}{#1},
+    diplomacy/.store in = \DiplomacyProf,
+    diplomacy/item/.code = \setcounter{DiplomacyItem}{#1},
+    intimidation/.store in = \IntimidationProf,
+    intimidation/item/.code = \setcounter{IntimidationItem}{#1},
+    lore I/.store in = \LoreIProf,
+    lore I/item/.code = \setcounter{LoreIItem}{#1},
+    lore I/name/.store in = \LoreIName,
+    lore II/.store in = \LoreIIProf,
+    lore II/item/.code = \setcounter{LoreIIItem}{#1},
+    lore II/name/.store in = \LoreIIName,
+    medicine/.store in = \MedicineProf,
+    medicine/item/.code = \setcounter{MedicineItem}{#1},
+    nature/.store in = \NatureProf,
+    nature/item/.code = \setcounter{NatureItem}{#1},
+    occultism/.store in = \OccultismProf,
+    occultism/item/.code = \setcounter{OccultismItem}{#1},
+    performance/.store in = \PerformanceProf,
+    performance/item/.code = \setcounter{PerformanceItem}{#1},
+    religion/.store in = \ReligionProf,
+    religion/item/.code = \setcounter{ReligionItem}{#1},
+    society/.store in = \SocietyProf,
+    society/item/.code = \setcounter{SocietyItem}{#1},
+    stealth/.store in = \StealthProf,
+    stealth/item/.code = \setcounter{StealthItem}{#1},
+    survival/.store in = \SurvivalProf,
+    survival/item/.code = \setcounter{SurvivalItem}{#1},
+    thievery/.store in = \ThieveryProf,
+    thievery/item/.code = \setcounter{ThieveryItem}{#1},
+}
+
+\newcommand{\setSkills}[1]{
+    \pgfkeys{
+        skill, 
+        #1
+    }
+}
+
+\pgfkeys{
+    weapon/.is family,
+}
+
+\pgfkeys{
+    weapon,
+    proficiency/.is family,
+    proficiency/light weapons/.store in = \LightWeaponProf,
+    proficiency/martial weapons/.store in = \MartialWeaponProf,
+    proficiency/other I/.store in = \OtherWeaponIProf,
+    proficiency/other I/name/.store in = \OtherWeaponI,
+    proficiency/other II/.store in = \OtherWeaponIIProf,
+    proficiency/other II/name/.store in = \OtherWeaponII,
+}
+
+\pgfkeys{
+    weapon/.cd,
+    melee I/.is family,
+    melee I/.cd,
+    name/.store in = \WeaponI,
+    traits/.store in = \WeaponITraits,
+    other/.store in = \WeaponIOther,
+    damage dice/.store in = \WeaponIDice,
+    proficiency/.store in = \WeaponIProf,
+    item bonus/.code = \setcounter{WeaponIItem}{#1},
+    is finesse/.code = \setbool{WeaponIisFinesse}{true},
+    key ability score/.is choice,
+    key ability score/strength/.code = \setcounter{WeaponIKey}{\value{MStr}},
+    key ability score/dexterity/.code = \setcounter{WeaponIKey}{\value{MDes}},
+    key ability score/constitution/.code = \setcounter{WeaponIKey}{\value{MCos}},
+    key ability score/intelligence/.code = \setcounter{WeaponIKey}{\value{MInt}},
+    key ability score/wisdom/.code = \setcounter{WeaponIKey}{\value{MSag}},
+    key ability score/charisma/.code = \setcounter{WeaponIKey}{\value{MCar}},
+    damage type/.store in = \WeaponIDmgType,
+    wspec/.code = \setbool{WeaponIWSpec}{true}
+}
+
+\pgfkeys{
+    weapon/.cd,
+    melee II/.is family,
+    melee II/.cd,
+    name/.store in = \WeaponII,
+    traits/.store in = \WeaponIITraits,
+    other/.store in = \WeaponIIOther,
+    damage dice/.store in = \WeaponIIDice,
+    proficiency/.store in = \WeaponIIProf,
+    item bonus/.code = \setcounter{WeaponIIItem}{#1},
+    is finesse/.code = \setbool{WeaponIIisFinesse}{true},
+    key ability score/.is choice,
+    key ability score/strength/.code = \setcounter{WeaponIIKey}{\value{MStr}},
+    key ability score/dexterity/.code = \setcounter{WeaponIIKey}{\value{MDes}},
+    key ability score/constitution/.code = \setcounter{WeaponIIKey}{\value{MCos}},
+    key ability score/intelligence/.code = \setcounter{WeaponIIKey}{\value{MInt}},
+    key ability score/wisdom/.code = \setcounter{WeaponIIKey}{\value{MSag}},
+    key ability score/charisma/.code = \setcounter{WeaponIIKey}{\value{MCar}},
+    damage type/.store in = \WeaponIIDmgType,
+    wspec/.code = \setbool{WeaponIIWSpec}{true}
+}
+
+\pgfkeys{
+    weapon/.cd,
+    melee III/.is family,
+    melee III/.cd,
+    name/.store in = \WeaponIII,
+    traits/.store in = \WeaponIIITraits,
+    other/.store in = \WeaponIIIOther,
+    damage dice/.store in = \WeaponIIIDice,
+    proficiency/.store in = \WeaponIIIProf,
+    item bonus/.code = \setcounter{WeaponIIIItem}{#1},
+    is finesse/.code = \setbool{WeaponIIIisFinesse}{true},
+    key ability score/.is choice,
+    key ability score/strength/.code = \setcounter{WeaponIIIKey}{\value{MStr}},
+    key ability score/dexterity/.code = \setcounter{WeaponIIIKey}{\value{MDes}},
+    key ability score/constitution/.code = \setcounter{WeaponIIIKey}{\value{MCos}},
+    key ability score/intelligence/.code = \setcounter{WeaponIIIKey}{\value{MInt}},
+    key ability score/wisdom/.code = \setcounter{WeaponIIIKey}{\value{MSag}},
+    key ability score/charisma/.code = \setcounter{WeaponIIIKey}{\value{MCar}},
+    damage type/.store in = \WeaponIIIDmgType,
+    wspec/.code = \setbool{WeaponIIIWSpec}{true}
+}
+
+\pgfkeys{
+    weapon/.cd,
+    ranged I/.is family,
+    ranged I/.cd,
+    name/.store in = \RangedI,
+    traits/.store in = \RangedITraits,
+    other/.store in = \RangedIOther,
+    damage dice/.store in = \RangedIDice,
+    proficiency/.store in = \RangedIProf,
+    item bonus/.code = \setcounter{RangedIItem}{#1},
+    is finesse/.code = \setbool{RangedIisFinesse}{true},
+    damage special/.code = \setcounter{RangedIDmgSpecial}{#1},
+    key ability score/.is choice,
+    key ability score/strength/.code = \setcounter{RangedIKey}{\value{MStr}},
+    key ability score/dexterity/.code = \setcounter{RangedIKey}{\value{MDes}},
+    key ability score/constitution/.code = \setcounter{RangedIKey}{\value{MCos}},
+    key ability score/intelligence/.code = \setcounter{RangedIKey}{\value{MInt}},
+    key ability score/wisdom/.code = \setcounter{RangedIKey}{\value{MSag}},
+    key ability score/charisma/.code = \setcounter{RangedIKey}{\value{MCar}},
+    damage type/.store in = \RangedIDmgType,
+    wspec/.code = \setbool{RangedIWSpec}{true}
+}
+
+\pgfkeys{
+    weapon/.cd,
+    ranged II/.is family,
+    ranged II/.cd,
+    name/.store in = \RangedII,
+    traits/.store in = \RangedIITraits,
+    other/.store in = \RangedIIOther,
+    damage dice/.store in = \RangedIIDice,
+    proficiency/.store in = \RangedIIProf,
+    item bonus/.code = \setcounter{RangedIIItem}{#1},
+    is finesse/.code = \setbool{RangedIIisFinesse}{true},
+    damage special/.code = \setcounter{RangedIIDmgSpecial}{#1},
+    key ability score/.is choice,
+    key ability score/strength/.code = \setcounter{RangedIIKey}{\value{MStr}},
+    key ability score/dexterity/.code = \setcounter{RangedIIKey}{\value{MDes}},
+    key ability score/constitution/.code = \setcounter{RangedIIKey}{\value{MCos}},
+    key ability score/intelligence/.code = \setcounter{RangedIIKey}{\value{MInt}},
+    key ability score/wisdom/.code = \setcounter{RangedIIKey}{\value{MSag}},
+    key ability score/charisma/.code = \setcounter{RangedIIKey}{\value{MCar}},
+    damage type/.store in = \RangedIIDmgType,
+    wspec/.code = \setbool{RangedIIWSpec}{true}
+}
+
+\pgfkeys{
+    weapon/.cd,
+    ranged III/.is family,
+    ranged III/.cd,
+    name/.store in = \RangedIII,
+    traits/.store in = \RangedIIITraits,
+    other/.store in = \RangedIIIOther,
+    damage dice/.store in = \RangedIIIDice,
+    proficiency/.store in = \RangedIIIProf,
+    item bonus/.code = \setcounter{RangedIIIItem}{#1},
+    is finesse/.code = \setbool{RangedIIIisFinesse}{true},
+    damage special/.code = \setcounter{RangedIIIDmgSpecial}{#1},
+    key ability score/.is choice,
+    key ability score/strength/.code = \setcounter{RangedIIIKey}{\value{MStr}},
+    key ability score/dexterity/.code = \setcounter{RangedIIIKey}{\value{MDes}},
+    key ability score/constitution/.code = \setcounter{RangedIIIKey}{\value{MCos}},
+    key ability score/intelligence/.code = \setcounter{RangedIIIKey}{\value{MInt}},
+    key ability score/wisdom/.code = \setcounter{RangedIIIKey}{\value{MSag}},
+    key ability score/charisma/.code = \setcounter{RangedIIIKey}{\value{MCar}},
+    damage type/.store in = \RangedIIIDmgType,
+    wspec/.code = \setbool{RangedIIIWSpec}{true}
+}
+
+\newcommand{\setWeapon}[1]{
+    \pgfkeys{%
+        weapon/.cd,
+        #1
+    }
+}

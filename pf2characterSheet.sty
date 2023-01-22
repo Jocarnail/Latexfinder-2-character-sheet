@@ -1,0 +1,1366 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{pf2charactersheet}
+
+\RequirePackage[
+    usenames,
+    dvipsnames,
+    svgnames,
+    table
+    ]{xcolor}
+
+\RequirePackage{tikz}
+\RequirePackage{etoolbox}
+\RequirePackage{graphicx, float}
+\DeclareGraphicsExtensions{.png,.jpg,.pdf,.jpeg}
+\RequirePackage{adjustbox}
+\RequirePackage{pf2character}
+
+% \RequirePackage{calc}
+
+%%%
+% Calculated Characteristics
+%%%
+
+
+%%%
+% General Functions — Proficiency
+%%%
+%Proficiency handlers
+\newcounter{Prof}
+\pgfkeys{
+    proficiency/.default=U,
+    proficiency/.estore in=\proficiency}
+
+\newbool{hideProficiency}
+\pgfkeys{
+    proficiency/hide/.is choice,
+    proficiency/hide/true/.code={\setbool{hideProficiency}{true}},
+    proficiency/hide/false/.code={\setbool{hideProficiency}{false}}
+    proficiency/hide/.default=false}
+
+\newcommand{\CalculateProficiency}[1]{
+	\setcounter{Prof}{0}
+    \pgfkeys{#1}
+	%
+	\expandafter\ifstrequal\expandafter{\proficiency}{T}{
+	\setcounter{Prof}{\theLevel}
+	\addtocounter{Prof}{2}
+	}{}
+	%
+	\expandafter\ifstrequal\expandafter{\proficiency}{E}{
+	\setcounter{Prof}{\theLevel}
+	\addtocounter{Prof}{4}
+	}{}
+	%
+	\expandafter\ifstrequal\expandafter{\proficiency}{M}{
+	\setcounter{Prof}{\theLevel}
+	\addtocounter{Prof}{6}
+	}{}
+	%
+	\expandafter\ifstrequal\expandafter{\proficiency}{L}{
+	\setcounter{Prof}{\theLevel}
+	\addtocounter{Prof}{8}
+	}{}
+	%
+	\ifbool{hideProficiency}{
+        }{
+        \theProf
+        }
+}
+
+\newcommand{\ProficiencyDot}[1]{
+	\newcommand{\Pos}{0.0,0.0}
+
+    \pgfkeys{#1}
+	%
+	\expandafter\ifstrequal\expandafter{\proficiency}{T}{
+	\renewcommand{\Pos}{-0.02, 0}
+    \fill(\Pos) circle (2pt);
+	}{
+	%
+	\expandafter\ifstrequal\expandafter{\proficiency}{E}{
+	\renewcommand{\Pos}{-0.007, 0}
+    \fill(\Pos) circle (2pt);
+	}{
+	%
+	\expandafter\ifstrequal\expandafter{\proficiency}{M}{
+	\renewcommand{\Pos}{0.007, 0}
+    \fill(\Pos) circle (2pt);
+	}{
+	%
+	\expandafter\ifstrequal\expandafter{\proficiency}{L}{
+	\renewcommand{\Pos}{0.02, 0}
+    \fill(\Pos) circle (2pt);
+	}{
+    }}}}
+
+}
+
+% General Functions — Total CD
+\newcounter{CDTotal}
+
+\pgfkeys{CD/.is family}
+\pgfkeys{
+    /CD/key/.store in = \key,
+    /CD/item/.default = 0, 
+    /CD/item/.store in = \item,
+    /CD/proficiency/.default = U, 
+    /CD/proficiency/.store in = \proficiency
+}
+
+\newcommand{\CalculateTotalCD}[1]{
+    \pgfkeys{#1}
+	\setcounter{CDTotal}{10}
+	
+	\CalculateProficiency{proficiency = \proficiency, proficiency/hide=true}
+	\addtocounter{CDTotal}{\value{Prof}}
+	\addtocounter{CDTotal}{\key}
+	\addtocounter{CDTotal}{\item}
+	
+	\theCDTotal
+}
+
+%ClassCD
+\newcommand{\CalculateClassDC}{
+	\newcounter{ClassDC}
+
+	\CalculateProficiency{proficiency = \ClassProf, proficiency/hide = true}
+	\setcounter{ClassDC}{\value{Prof} + \value{ClassKey} + \value{ClassItemBonus} + 10}
+
+	\theClassDC
+}
+
+%Armor calculator
+\newcommand{\CalculateArmor}{
+	\newcounter{ArmorDes}
+	
+	\ifnum \value{MDes} < \value{CurrentArmorCap}
+	\setcounter{ArmorDes}{\value{MDes}}
+	\else
+	\setcounter{ArmorDes}{\value{CurrentArmorCap}}
+	\fi
+	
+	\CalculateTotalCD{CD, key = \value{ArmorDes}, proficiency = \CurrentArmorProf, item = \value{CurrentArmorItemBonus}}
+}
+
+% General function — Calculate bonus
+\newcounter{Bonus}
+\newcommand{\CalculateBonus}[3]{
+	\setcounter{Bonus}{0}
+
+	\CalculateProficiency{proficiency = #2, proficiency/hide = true}
+	\addtocounter{Bonus}{\value{Prof}}
+	\addtocounter{Bonus}{#1}
+	\addtocounter{Bonus}{#3}
+
+	\theBonus
+}
+
+% General function — Skill bonus
+\pgfkeys{
+    skill/.is family
+}
+\pgfkeys{
+    /skill/proficiency/.default = U,
+    /skill/proficiency/.store in = \proficiency
+}
+
+\newbool{haveArmorPenalty}
+\pgfkeys{
+    /skill/haveArmorPenalty/.is choice,
+    /skill/haveArmorPenalty/.default = false,
+    /skill/haveArmorPenalty/true/.code = {\booltrue{haveArmorPenalty}},
+    /skill/haveArmorPenalty/false/.code = {\boolfalse{haveArmorPenalty}}
+}
+
+
+\pgfkeys{
+    /skill/ArmorPenalty/.default = 0,
+    /skill/ArmorPenalty/.estore in = \armorPenalty
+}
+\pgfkeys{
+    /skill/key/.estore in = \key,
+    /skill/item/.estore in = \item
+}
+
+\newcounter{SkillBonus}
+\newcommandx{\CalculateSkillBonus}[1]{
+	\pgfkeys{#1}
+    \setcounter{SkillBonus}{0}
+
+	\CalculateProficiency{proficiency = \proficiency, proficiency/hide=true}
+	\addtocounter{SkillBonus}{\value{Prof}}
+	\addtocounter{SkillBonus}{\key}
+	\addtocounter{SkillBonus}{\item}
+	\ifbool{haveArmorPenalty}{\addtocounter{SkillBonus}{-\armorPenalty}}{}
+
+	\theSkillBonus
+}
+
+\newcommand{\TSBox}[3]{
+	%Bounding Box
+	% \draw[very thick] (0,0) rectangle ++(0.108,0.1);
+
+	%Key
+	\node[
+	anchor= base,
+	text width = 0.5cm,
+	align = center
+	]
+	at (0.0235, 0.04)
+	{\large\the#1};
+
+	%Prof
+	\node[
+	anchor= base,
+	text width = 0.5cm,
+	align = center
+	]
+	at (0.075, 0.056)
+	{\large\CalculateProficiency{proficiency = #2}};
+
+	%Item
+	\node[
+	anchor= base,
+	text width = 0.5cm,
+	align = center
+	]
+	at (0.0235, 0.009)
+	{\ifnum #3=0 
+
+	\else
+	\large\the#3
+	\fi};
+
+	%ProfDot
+	\begin{scope}[shift={(0.077, 0.013)}]
+		\ProficiencyDot{proficiency = #2}
+	\end{scope}
+
+	%Total
+	\node[
+	anchor= base,
+	text width = 0.9cm,
+	align = center
+	]
+	at (0.0518, 0.089)
+	{\Large\CalculateBonus{#1}{#2}{#3}};
+}
+
+%Skills
+\newcommandx{\DrawSkill}[1]{
+	% \draw[thick] (0,0) rectangle (0.445, 0.028);
+    \pgfkeys{#1}
+			
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0.21, 0.001)
+	{\Large\the\key};
+
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0.255, 0.001)
+	{\Large\CalculateProficiency{proficiency = \proficiency}};
+
+	\begin{scope}[shift={(0.3245, 0.009)}]
+		\ProficiencyDot{proficiency = \proficiency}
+	\end{scope}
+
+	\ifnum \item = 0 {}
+	\else {
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0.353, 0.001)
+	{\Large\the\item};
+	}\fi
+
+	\ifbool{haveArmorPenalty}{
+		\ifnum \armorPenalty = 0 {}
+		\else {
+            \node[
+                anchor= south west,
+                text width = 0.6 cm,
+                align = center
+            ]
+            at (0.398, 0.001)
+            {\Large\the\armorPenalty};
+		}\fi
+	}{}
+
+	\node[
+		anchor= south west,
+		text width = 0.75 cm,
+		align = center
+	]
+	at (0.149, 0.003)
+	{\Large\CalculateSkillBonus{#1}};
+}
+
+
+
+
+\newcommand{\DamageDot}[1]{
+	\newcommand{\DotPos}{0,0} %S is (0,0)
+
+	\expandafter\ifstrequal\expandafter{#1}{P}{
+		\renewcommand{\DotPos}{0,0.0108}
+	}{}
+	\expandafter\ifstrequal\expandafter{#1}{B}{
+		\renewcommand{\DotPos}{0,0.02}
+	}{}
+
+	\expandafter\ifstrempty\expandafter{#1}{}{
+		\fill(\DotPos) circle (2pt);
+	}
+}
+
+
+\newcounter{weaponKey}
+\newcounter{weaponItem}
+\pgfkeys{
+    weapon/.is family,
+    weapon/key/.code = {\setcounter{weaponKey}{#1}},
+    weapon/proficiency/.default = U,
+    weapon/proficiency/.estore in = \proficiency,
+    weapon/item/.default = 0,
+    weapon/item/.code = {\setcounter{weaponItem}{#1}},
+    weapon/damageDice/.estore in = \damageDice,
+    weapon/damageType/.estore in = \damageType,
+    weapon/name/.estore in = \weaponName
+}
+
+\pgfkeys{
+    weapon/finesse/.store in = \weaponFinesse,
+    weapon/finesse/.default = false,
+}
+
+\pgfkeys{
+    weapon/wspec/.store in = \wspec
+}
+
+\pgfkeys{
+    weapon/traits/.estore in = \weaponTraits,
+    weapon/other/.estore in = \weaponOther
+}
+
+\newcommand{\WeaponBox}[1]{
+    \pgfkeys{#1}
+	
+	% \draw[red, thick] (0,0) rectangle (0.479,0.072);
+			
+	\node[
+		anchor= base,
+		text width = 4.15 cm,
+		align = left
+	]
+	at (0.103,0.043)
+	{\maxsizebox{4.15cm}{!}{\Large \weaponName}};
+
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0.2965,0.037)
+	{\Large \ifbool{\weaponFinesse}{%
+		\ifnum \value{MDes}>\value{MStr}
+		{\theMDes
+		\setcounter{weaponKey}{\value{MDes}}}
+		\else {\theweaponKey}
+		\fi
+	}{\theweaponKey}};
+
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0.34,0.037)
+	{\Large \CalculateProficiency{proficiency = \proficiency}};
+
+	\begin{scope}[shift={(0.4088, 0.0465)}]
+		\ProficiencyDot{proficiency = \proficiency}
+	\end{scope}
+
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0.438,0.037)
+	{\ifnum \value{weaponItem} = 0{}
+	\else{\Large \theweaponItem}
+	\fi};
+
+	\node[
+		anchor= south,
+		text width = 1 cm,
+		align = center
+	]
+	at (0.247,0.041)
+	{\huge \CalculateBonus{\value{weaponKey}}{\proficiency}{\value{weaponItem}}};
+
+
+	%Damage
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0,0)
+	{\large \damageDice};
+
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0.05,0)
+	{\large \theMStr};
+
+	\begin{scope}[shift = {(0.1055,0.003)}]
+		\DamageDot{\damageType}
+	\end{scope}
+
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0.133,0)
+	{\ifbool{\wspec}{\large X}{}};
+
+	\node[
+		anchor= base,
+		text width = 2.1 cm,
+		align = center
+	]
+	at (0.235,0.005)
+	{\weaponOther};
+
+	\node[
+		anchor= base,
+		text width = 3.6 cm,
+		align = center
+	]
+	at (0.387,0.005)
+	{\maxsizebox{3.6cm}{!}{\weaponTraits}};
+}
+
+\newcounter{rangedDmgSpecial}
+
+\pgfkeys{
+    weapon/damageSpecial/.default = 0,
+    weapon/damageSpecial/.code = {\setcounter{rangedDmgSpecial}{#1}}
+}
+\newcommand{\RangedWeaponBox}[1]{
+    \pgfkeys{#1}
+	
+	% \draw[red, thick] (0,0) rectangle (0.479,0.072);
+			
+	\node[
+		anchor= base,
+		text width = 4.15 cm,
+		align = left
+	]
+	at (0.103,0.043)
+	{\maxsizebox{4.15cm}{!}{\Large \weaponName}};
+
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0.2965,0.037)
+	{\Large \theweaponKey};
+
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0.34,0.037)
+	{\Large \CalculateProficiency{proficiency = \proficiency}};
+
+	\begin{scope}[shift={(0.4088, 0.0465)}]
+		\ProficiencyDot{proficiency = \proficiency}
+	\end{scope}
+
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0.438,0.037)
+	{\ifnum \value{weaponItem} = 0{}
+	\else{\Large \theweaponItem}
+	\fi};
+
+	\node[
+		anchor= south,
+		text width = 1 cm,
+		align = center
+	]
+	at (0.247,0.037)
+	{\huge \CalculateBonus{\value{weaponKey}}{\proficiency}{\value{weaponItem}}};
+
+
+	%Damage
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0,0)
+	{\large \damageDice};
+
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0.05,0)
+	{\large \ifnum \value{rangedDmgSpecial} = 0 {}
+    \else {\large \therangedDmgSpecial}
+    \fi};
+
+	\begin{scope}[shift = {(0.1055,0.003)}]
+		\DamageDot{\damageType}
+	\end{scope}
+
+	\node[
+		anchor= south west,
+		text width = 0.6 cm,
+		align = center
+	]
+	at (0.133,0)
+	{\ifbool{\wspec}{\large X}{}};
+
+	\node[
+		anchor= base,
+		text width = 2.1 cm,
+		align = center
+	]
+	at (0.235,0.005)
+	{\weaponOther};
+
+	\node[
+		anchor= base,
+		text width = 3.6 cm,
+		align = center
+	]
+	at (0.387,0.005)
+	{\maxsizebox{3.6cm}{!}{\weaponTraits}};
+}
+
+%%% Character Sheet Start %%%
+\newcommand{\characterSheet}{
+    \newgeometry{margin = 0pt, top = 1.5cm}
+    \begin{tikzpicture}
+        \node[anchor = south west, inner sep=0] (image) at (0,0) {\includegraphics[width = \textwidth]{./CharacterSheetJPG/PZO2101-CharacterSheet-BW_pages-to-jpg-0001.jpg}};
+        
+        \begin{scope}[x={(image.south east)}, y={(image.north west)}]
+            %Character Name
+            \node[
+            anchor= north west, 
+            text width = 6.7cm, 
+            align=left] 
+            at (0.23, 0.96) 
+            {\LARGE \theCharacterName};
+
+            %Player Name
+            \node[
+            anchor= north west, 
+            text width = 6.6cm, 
+            align=right] 
+            at (0.23, 0.918) 
+            {\small \thePlayerName};
+
+            %Anchestry
+            \node[ 
+            anchor= north west, 
+            text width = 6.3cm, 
+            align=right] 
+            at (0.565, 0.975) 
+            {\theAnchestry};
+            %Background
+
+            \node[
+            anchor= north west, 
+            text width = 6.3cm, 
+            align=right] 
+            at (0.565, 0.952) 
+            {\theBackground};
+
+            %Class
+            \node[ 
+            anchor= north west, 
+            text width = 6.3cm, 
+            align=right] 
+            at (0.565, 0.925) 
+            {\theClass};
+
+            %Size
+            \node[ 
+            anchor= north west, 
+            text width = 0.9cm, 
+            align=right] 
+            at (0.565, 0.905) 
+            {\theSize};
+
+            %Alignement
+            \node[
+            anchor= north west, 
+            text width = 1.4cm, 
+            align=left] 
+            at (0.62, 0.9005) 
+            {\maxsizebox{1.4cm}{!}{\theAlignement}};
+
+            %Traits
+            \node[
+            anchor= north west, 
+            text width = 3.5cm, 
+            align=right] 
+            at (0.7, 0.905) 
+            {\small\theCharacterTraits};
+
+            %Deity
+            \node[
+            anchor= north west, 
+            text width = 6.3cm, 
+            align=right] 
+            at (0.565, 0.888) 
+            {\small\theDeity};
+            
+            %Level
+            \node[
+            text width=1cm,
+            align=center]
+            at (0.925, 0.94)
+            {\HUGE \theLevel};
+            
+            
+            %Ability Scores
+            %Str
+            \node[
+                anchor= base,
+                text width = 1cm,
+                align = center
+            ]
+            at (0.062, 0.822)
+            {\huge\theMStr};
+            
+            \node[
+                anchor= base,
+                text width = 0.8cm,
+                align = center
+            ]
+            at (0.298, 0.824)
+            {\huge\theStr};
+            
+            %Des
+            \node[
+                anchor= base,
+                text width = 1cm,
+                align = center
+            ]
+            at (0.062, 0.787)
+            {\huge\theMDes};
+            
+            \node[
+                anchor= base,
+                text width = 0.8cm,
+                align = center
+            ]
+            at (0.298, 0.788)
+            {\huge\theDes};
+            
+            %Cos
+            \node[
+                anchor= base,
+                text width = 1cm,
+                align = center
+            ]
+            at (0.062, 0.752)
+            {\huge\theMCos};
+            
+            \node[
+                anchor= base,
+                text width = 0.8cm,
+                align = center
+            ]
+            at (0.298, 0.753)
+            {\huge\theCos};
+            
+            %Int
+            \node[
+                anchor= base,
+                text width = 1cm,
+                align = center
+            ]
+            at (0.062, 0.717)
+            {\huge\theMInt};
+            
+            \node[
+                anchor= base,
+                text width = 0.8cm,
+                align = center
+            ]
+            at (0.298, 0.718)
+            {\huge\theInt};
+            
+            %Sag
+            \node[
+                anchor= base,
+                text width = 1cm,
+                align = center
+            ]
+            at (0.062, 0.6815)
+            {\huge\theMSag};
+            
+            \node[
+                anchor= base,
+                text width = 0.8cm,
+                align = center
+            ]
+            at (0.298, 0.6825)
+            {\huge\theSag};
+            
+            %Car
+            \node[
+                anchor= base,
+                text width = 1cm,
+                align = center
+            ]
+            at (0.062, 0.646)
+            {\huge\theMCar};
+            
+            \node[
+                anchor= base,
+                text width = 0.8cm,
+                align = center
+            ]
+            at (0.298, 0.647)
+            {\huge\theCar};
+            
+            %ClassDC
+            \node[
+                anchor = base,
+                text width = 0.5cm,
+                align = center
+            ]
+            at (0.162, 0.595)
+            {\Large\theClassKey};
+            
+            %Prof ClassDC
+            \node[
+                anchor = base,
+                text width = 0.5cm,
+                align = center
+            ]
+            at (0.2047, 0.611)
+            {\Large\CalculateProficiency{proficiency = \ClassProf}};
+            
+            \begin{scope}[shift={(0.254, 0.6)}]
+                \ProficiencyDot{proficiency = \ClassProf}
+            \end{scope}
+            
+            %ClassItemBonus
+            \node[
+                anchor = base,
+                text width = 0.5cm,
+                align = center
+            ]
+            at (0.3035, 0.595)
+            {\ifnum \value{ClassItemBonus}=0 
+            
+            \else
+            \Large\theClassItemBonus
+            
+            \fi};
+            
+            %ClassDCTotal
+            \node[
+                anchor = base,
+                text width = 1cm,
+                align = center
+            ]
+            at (0.0615, 0.612)
+            {\huge\CalculateClassDC};
+            
+            %Armor Class
+            %Des
+            \node[
+                anchor= base,
+                text width = 0.5cm,
+                align = center
+            ]
+            at (0.52, 0.82)
+            {\Large\theMDes};
+            
+            %Cap
+            \node[
+                anchor= base,
+                text width = 0.5cm,
+                align = center
+            ]
+            at (0.568, 0.82)
+            {\Large\theCurrentArmorCap};
+            
+            %Armor Proficiency
+            \node[
+                anchor= base,
+                text width = 0.5cm,
+                align = center
+            ]
+            at (0.608, 0.837)
+            {\Large\CalculateProficiency{proficiency = \CurrentArmorProf}};
+            
+            \begin{scope}[shift={(0.6585, 0.825)}]
+                \ProficiencyDot{proficiency = \CurrentArmorProf}
+            \end{scope}
+            
+            %Armor Item Bonuc
+            \node[
+                anchor= base,
+                text width = 0.5cm,
+                align = center
+            ]
+            at (0.708, 0.821)
+            {\Large\theCurrentArmorItemBonus};
+            
+            %Armor Value
+            \node[
+                anchor= base,
+                text width = 1cm,
+                align = center
+            ]
+            at (0.417, 0.827)
+            {\Huge\CalculateArmor};
+            
+            %Shield
+            \node[
+                anchor= base,
+                text width = 0.4cm,
+                align = center
+            ]
+            at (0.526, 0.756)
+            {\ifnum \value{ShieldBonus}=0 
+            
+            \else
+            \huge\theShieldBonus
+            
+            \fi
+            };
+            
+            %Hardness
+            \node[
+                anchor= base,
+                text width = 0.9cm,
+                align = center
+            ]
+            at (0.58, 0.755)
+            {\ifnum \value{ShieldHard}=0 
+                {}
+            \else{\Large\theShieldHard}
+            \fi};
+            
+            %ShieldHP
+            \node[
+                anchor= base,
+                text width = 0.5cm,
+                align = center
+            ]
+            at (0.635, 0.755)
+            {\ifnum \value{ShieldHP}=0 {}
+            \else{\large\theShieldHP}
+            \fi};
+            
+            %ShieldBT
+            \node[
+                anchor= base,
+                text width = 0.5cm,
+                align = right
+            ]
+            at (0.661, 0.755)
+            {\ifnum \value{ShieldHP}=0 {}
+            \else{\the\numexpr\value{ShieldHP}/2}
+            \fi};
+            
+            %Proficiencies
+            %Unarmored
+            \begin{scope}[shift={(0.506, 0.7923)}]
+                \ProficiencyDot{proficiency = \UnarmoredProf}
+            \end{scope}
+            
+            %Light Armor
+            \begin{scope}[shift={(0.5678, 0.7923)}]
+                \ProficiencyDot{proficiency = \LightArmorProf}
+            \end{scope}
+            
+            %Medium Armor
+            \begin{scope}[shift={(0.6295, 0.7923)}]
+                \ProficiencyDot{proficiency = \MediumArmorProf}
+            \end{scope}
+            
+            %Heavy Armor
+            \begin{scope}[shift={(0.691, 0.7923)}]
+                \ProficiencyDot{proficiency = \HeavyArmorProf}
+            \end{scope}
+            
+            %TS
+            %Fortitude
+            \begin{scope}[shift={(0.365, 0.619)}]
+                \TSBox{\value{MCos}}{\FortitudeProf}{\value{FortitudeItem}}
+                
+            \end{scope}
+            
+            %Reflex
+            \begin{scope}[shift={(0.498, 0.619)}]
+                \TSBox{\value{MDes}}{\ReflexProf}{\value{ReflexItem}}
+                
+            \end{scope}
+            
+            %Will
+            \begin{scope}[shift={(0.629, 0.619)}]
+                \TSBox{\value{MSag}}{\WillProf}{\value{WillItem}}
+                
+            \end{scope}
+
+            %HP
+            \node[
+                anchor= center,
+                text width = 0.6cm,
+                align = center
+            ]
+            at (0.79, 0.846)
+            {\Large\theHPTot};
+            
+            %Resistance
+            \node[
+                anchor= south west,
+                text width = 3.8 cm,
+                align = left
+            ]
+            at (0.77, 0.735)
+            {\footnotesize R: \Resist\\[-1ex] I: \Imune};
+
+            %Perception
+            \node[
+                anchor= base,
+                text width = 0.6cm,
+                align = center
+            ]
+            at (0.781, 0.674)
+            {\huge\CalculateBonus{\value{MSag}}{\PerceptionProf}{\value{PerceptionItem}}};
+
+            \node[
+                anchor= base,
+                text width = 0.4cm,
+                align = center
+            ]
+            at (0.817, 0.637)
+            {\large\theMSag};
+
+            \node[
+                anchor= base,
+                text width = 0.4cm,
+                align = center
+            ]
+            at (0.855, 0.654)
+            {\CalculateProficiency{proficiency = \PerceptionProf}};
+
+            \begin{scope}[shift={(0.902, 0.642)}]
+                \ProficiencyDot{proficiency = \PerceptionProf}
+            \end{scope}
+
+            \node[
+                anchor= base,
+                text width = 0.4cm,
+                align = center
+            ]
+            at (0.948, 0.637)
+            {\ifnum \value{PerceptionItem}=0 
+            
+            \else
+            \large\thePerceptionItem
+            
+            \fi
+            };
+
+            %Sensi
+            \node[
+                anchor= south west,
+                text width = 3.54 cm,
+                align = left
+            ]
+            at (0.785, 0.592)
+            {\footnotesize \Senses};
+
+            %Speed
+            \node[
+                anchor= south west,
+                text width = 1.34 cm,
+                align = center
+            ]
+            at (0.124, 0.558)
+            {\huge \theSpeed};
+
+            \node[
+                anchor= south west,
+                text width = 5.25 cm,
+                align = right
+            ]
+            at (0.255, 0.557)
+            {\Movement};
+
+            \begin{scope}[shift = {(0.525, 0.537)}]
+                \ifbool{ArmorFlexible}{
+                    \DrawSkill{skill, 
+                    key = \value{MDes}, 
+                    proficiency = \AcrobaticProf,
+                    item = \value{AcrobaticItem}
+                    }
+                }{
+                    \DrawSkill{skill, 
+                    key = \value{MDes}, 
+                    proficiency = \AcrobaticProf,
+                    item = \value{AcrobaticItem},
+                    ArmorPenalty = \value{ArmorPenalty},
+                    haveArmorPenalty = true}
+                }
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.509)}]
+                \DrawSkill{skill, 
+                key = \value{MInt}, 
+                proficiency = \ArcanaProf,
+                item = \value{ArcanaItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.481)}]
+                \ifbool{ArmorFlexible}{
+                    \DrawSkill{skill, 
+                    key = \value{MStr}, 
+                    proficiency = \AthleticsProf,
+                    item = \value{AthleticsItem}
+                    }
+                }{
+                    \DrawSkill{skill, 
+                    key = \value{MStr}, 
+                    proficiency = \AthleticsProf,
+                    item = \value{AthleticsItem},
+                    haveArmorPenalty = true,
+                    ArmorPenalty = \value{ArmorPenalty}
+                    }
+                }
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.453)}]
+                \DrawSkill{skill, 
+                key = \value{MInt}, 
+                proficiency = \CraftingProf,
+                item = \value{CraftingItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.425)}]
+                \DrawSkill{skill, 
+                key = \value{MCar}, 
+                proficiency = \DeceptionProf,
+                item = \value{DeceptionItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.397)}]
+                \DrawSkill{skill, 
+                key = \value{MCar}, 
+                proficiency = \DiplomacyProf,
+                item = \value{DiplomacyItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.369)}]
+                \DrawSkill{skill, 
+                key = \value{MCar}, 
+                proficiency = \IntimidationProf,
+                item = \value{IntimidationItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.341)}]
+                \node[
+                    anchor= south west,
+                    text width = 1.8 cm,
+                    align = right
+                ]
+                at (0.005, 0.007)
+                {\LoreIName};
+
+                \DrawSkill{skill, 
+                key = \value{MInt}, 
+                proficiency = \LoreIProf,
+                item = \value{LoreIItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.314)}]
+                \node[
+                    anchor= south west,
+                    text width = 1.8 cm,
+                    align = right
+                ]
+                at (0.005, 0.007)
+                {\LoreIIName};
+
+                \DrawSkill{skill, 
+                key = \value{MInt}, 
+                proficiency = \LoreIIProf,
+                item = \value{LoreIIItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.286)}]
+                \DrawSkill{skill, 
+                key = \value{MSag}, 
+                proficiency = \MedicineProf,
+                item = \value{MedicineItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.258)}]
+                \DrawSkill{skill, 
+                key = \value{MSag}, 
+                proficiency = \NatureProf,
+                item = \value{NatureItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.230)}]
+                \DrawSkill{skill, 
+                key = \value{MInt}, 
+                proficiency = \OccultismProf,
+                item = \value{OccultismItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.202)}]
+                \DrawSkill{skill, 
+                key = \value{MCar}, 
+                proficiency = \PerformanceProf,
+                item = \value{PerformanceItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.174)}]
+                \DrawSkill{skill, 
+                key = \value{MSag}, 
+                proficiency = \ReligionProf,
+                item = \value{ReligionItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.146)}]
+                \DrawSkill{skill, 
+                key = \value{MInt}, 
+                proficiency = \SocietyProf,
+                item = \value{SocietyItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.118)}]
+                \ifbool{ArmorNoisy}{
+                    \DrawSkill{skill, 
+                    key = \value{MDes}, 
+                    proficiency = \StealthProf,
+                    item = \value{StealthItem},
+                    haveArmorPenalty = true,
+                    ArmorPenalty = \value{BaseArmorPenalty}
+                    }
+                }{
+                    \DrawSkill{skill, 
+                    key = \value{MDes}, 
+                    proficiency = \StealthProf,
+                    item = \value{StealthItem},
+                    haveArmorPenalty = true,
+                    ArmorPenalty = \value{ArmorPenalty}
+                    }
+                }
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.09)}]
+                \DrawSkill{skill, 
+                key = \value{MSag}, 
+                proficiency = \SurvivalProf,
+                item = \value{SurvivalItem}}
+            \end{scope}
+
+            \begin{scope}[shift = {(0.525, 0.062)}]
+                \DrawSkill{skill, 
+                    key = \value{MDes}, 
+                    proficiency = \ThieveryProf,
+                    item = \value{ThieveryItem},
+                    haveArmorPenalty = true,
+                    ArmorPenalty = \value{ArmorPenalty}
+                    }
+            \end{scope}
+
+            %Languages
+            \node[ 
+                anchor= south west,
+                text width = 9.1 cm,
+                align = left
+            ]
+            at (0.525, 0.024)
+            {\maxsizebox{9.1cm}{!}{\footnotesize\Languages}};
+
+            %Weapon Proficiencies
+            \begin{scope}[shift={(0.061, 0.03)}]
+                \ProficiencyDot{proficiency = \LightWeaponProf}
+            \end{scope}
+
+            \begin{scope}[shift={(0.125, 0.03)}]
+                \ProficiencyDot{proficiency = \MartialWeaponProf}
+            \end{scope}
+
+            \begin{scope}[shift={(0.1915, 0.03)}]
+                \ProficiencyDot{proficiency = \OtherWeaponIProf}
+            \end{scope}
+
+            \node[
+                anchor= south west,
+                text width = 2.1 cm,
+                align = left
+            ]
+            at (0.223, 0.027)
+            {\footnotesize\OtherWeaponI};
+
+            \begin{scope}[shift={(0.3722, 0.03)}]
+                \ProficiencyDot{proficiency = \OtherWeaponIIProf}
+            \end{scope}
+
+            \node[
+                anchor= south west,
+                text width = 2.1 cm,
+                align = left
+            ]
+            at (0.403, 0.027)
+            {\footnotesize\OtherWeaponII};
+
+            %Attacchi ed armi
+            \begin{scope}[shift={(0.035, 0.4625)}]
+
+                \WeaponBox{
+                    weapon,
+                    name = \WeaponI,
+                    key = \value{WeaponIKey},
+                    proficiency = \WeaponIProf,
+                    item = \value{WeaponIItem},
+                    finesse = WeaponIisFinesse,
+                    damageDice = \WeaponIDice,
+                    damageType = \WeaponIDmgType,
+                    wspec = WeaponIWSpec,
+                    traits = \WeaponITraits,
+                    other = \WeaponIOther
+                }
+
+                % \WeaponBox{\WeaponI}{WeaponIKey}{\WeaponIProf}{WeaponIItem}{WeaponIisFinesse}{\WeaponIDice}{\WeaponIDmgType}{WeaponIWSpec}{\WeaponIOther}{\WeaponITraits}
+
+            \end{scope}
+
+            \begin{scope}[shift={(0.035, 0.389)}]
+
+                \WeaponBox{
+                    weapon,
+                    name = \WeaponII,
+                    key = \value{WeaponIIKey},
+                    proficiency = \WeaponIIProf,
+                    item = \value{WeaponIIItem},
+                    finesse = WeaponIIisFinesse,
+                    damageDice = \WeaponIIDice,
+                    damageType = \WeaponIIDmgType,
+                    wspec = WeaponIIWSpec,
+                    traits = \WeaponIITraits,
+                    other = \WeaponIIOther
+                }
+            %     \WeaponBox{\WeaponII}{WeaponIIKey}{\WeaponIIProf}{WeaponIIItem}{WeaponIIisFinesse}{\WeaponIIDice}{\WeaponIIDmgType}{WeaponIIWSpec}{\WeaponIIOther}{\WeaponIITraits}
+
+            \end{scope}
+
+            \begin{scope}[shift={(0.035, 0.314)}]
+
+                \WeaponBox{
+                    weapon,
+                    name = \WeaponIII,
+                    key = \value{WeaponIIIKey},
+                    proficiency = \WeaponIIIProf,
+                    item = \value{WeaponIIIItem},
+                    finesse = WeaponIIIisFinesse,
+                    damageDice = \WeaponIIIDice,
+                    damageType = \WeaponIIIDmgType,
+                    wspec = WeaponIIIWSpec,
+                    traits = \WeaponIIITraits,
+                    other = \WeaponIIIOther
+                }
+            %     \WeaponBox{\WeaponIII}{WeaponIIIKey}{\WeaponIIIProf}{WeaponIIIItem}{WeaponIIIisFinesse}{\WeaponIIIDice}{\WeaponIIIDmgType}{WeaponIIIWSpec}{\WeaponIIIOther}{\WeaponIIITraits}
+
+            \end{scope}
+
+            \begin{scope}[shift={(0.035, 0.22)}]
+
+                \RangedWeaponBox{
+                    weapon,
+                    name = \RangedI,
+                    key = \value{RangedIKey},
+                    proficiency = \RangedIProf,
+                    item = \value{RangedIItem},
+                    finesse = RangedIisFinesse,
+                    damageDice = \RangedIDice,
+                    damageType = \RangedIDmgType,
+                    damageSpecial = \value{RangedIDmgSpecial}, 
+                    wspec = RangedIWSpec,
+                    traits = \RangedITraits,
+                    other = \RangedIOther
+                }
+
+            \end{scope}
+
+            \begin{scope}[shift={(0.035, 0.148)}]
+
+                \RangedWeaponBox{
+                    weapon,
+                    name = \RangedII,
+                    key = \value{RangedIIKey},
+                    proficiency = \RangedIIProf,
+                    item = \value{RangedIIItem},
+                    finesse = RangedIIisFinesse,
+                    damageDice = \RangedIIDice,
+                    damageType = \RangedIIDmgType,
+                    damageSpecial = \value{RangedIIDmgSpecial}, 
+                    wspec = RangedIIWSpec,
+                    traits = \RangedIITraits,
+                    other = \RangedIIOther
+                }
+
+            \end{scope}
+
+            \begin{scope}[shift={(0.035, 0.076)}]
+
+                \RangedWeaponBox{
+                    weapon,
+                    name = \RangedIII,
+                    key = \value{RangedIIIKey},
+                    proficiency = \RangedIIIProf,
+                    item = \value{RangedIIIItem},
+                    finesse = RangedIIIisFinesse,
+                    damageDice = \RangedIIIDice,
+                    damageType = \RangedIIIDmgType,
+                    damageSpecial = \value{RangedIIIDmgSpecial}, 
+                    wspec = RangedIIIWSpec,
+                    traits = \RangedIIITraits,
+                    other = \RangedIIIOther
+                }
+
+            \end{scope}
+
+        \end{scope}
+        
+    \end{tikzpicture}
+}
