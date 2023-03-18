@@ -1,0 +1,279 @@
+\documentclass[
+a4paper,
+twoside,
+11pt, 
+openany,
+]{memoir}
+
+
+%Language, character and font
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+
+%Document and page size
+\usepackage[margin = 1.5cm]{geometry}
+
+%Columns
+\usepackage[colaction, grid]{multicol} 
+\usepackage{paracol}
+
+%Hypenation control
+\usepackage{soul} %hypen/letterspacing and text flow
+
+
+
+%Perchè deve stare in fondo:
+\usepackage{enumitem} %Controllo liste
+\setlist{nosep}
+
+
+%Setting vari:		
+\hyphenpenalty 5000000
+
+\title{Character Name}
+\author{Player name}
+
+\usepackage{pf2characterstyle} %Style needs to be above sheet
+\usepackage{pf2charactersheet}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\setCharacter{%
+	character,
+	name = Name,
+	player = Player,
+	ancestry = Human,
+	background = Noble,
+	class = Fighter,
+	size = M,
+	characterTraits = {Humanoid},
+	alignement = Caotic Neutral,
+	deity = All of them,
+	level = 5,
+	strength = 3,
+	dexterity = 1,
+	constitution = 2,
+	intelligence = 0,
+	wisdom = 2,
+	charisma = 1,
+	classProf = T,
+	asi = intelligence,
+	asi = strength,
+	asi =  constitution,
+	asi = dexterity,
+	key/strength,
+}
+
+\setCharacter{
+	savingtrows,
+	fortitude = E,
+	reflex = E,
+}
+
+\setCharacter{
+	hp,
+	per level = 10,
+	race = 8,
+}
+
+\setCharacter{
+	speed = 25
+}
+
+\setCharacter{
+	perception,
+	proficiency = T,
+	senses = Visione crepuscolare,
+	languages = {Comune, Amurrun, Silvanico, Dragonico, Goblin}
+}
+
+\setArmor{%
+	proficiency,
+	unarmored = T,
+	light armor = T,
+	medium armor = T,
+}
+
+\setArmor{%
+	current,
+	armorCap = 2,
+	proficiency = T,
+	item bonus = 3,
+	armor penalty = 2,
+	strength required = 14,
+}
+
+% \setArmor{%
+% 	shield,
+% 	bonus = 3,
+% 	hardness = 1,
+% 	hp = 30
+% }
+
+\setSkills{%
+	acrobatics = T,
+	athletics = T,
+	crafting = E,
+	deception = T,
+	diplomacy = T,
+	lore I/name = Alchool,
+	lore I = T,
+	stealth = T,
+	survival = E,
+	thievery = T,
+}
+
+\setWeapon{%
+	proficiency/.cd,
+	light weapons = T,
+	other I = T,
+	other I/name = {Bombe},
+}
+
+\setWeapon{%
+	melee I,
+	name = Artigli,
+	traits = {Agile, Finesse, Unarmed},
+	other = Brawling,
+	damage dice = 1d6,
+	proficiency = T,
+	key ability score = strength,
+	damage type = S,
+	is finesse,
+}
+
+\setWeapon{%
+	melee II,
+	name = Bastone Ferrato,
+	traits = {2H: 1d8},
+	other = Club,
+	damage dice = 1d4,
+	proficiency = T,
+	key ability score = strength,
+	damage type = B,
+}
+
+\setWeapon{%
+	melee III,
+	name = Tridente +1,
+	traits = {Throw 20ft},
+	other = Spear,
+	item bonus = 1,
+	damage dice = 1d8,
+	proficiency = T,
+	key ability score = strength,
+	damage type = P,
+}
+
+\setWeapon{%
+	ranged I,
+	name = Bombe,
+	traits = {Alchemical, Consumable, Splash, Manipulate},
+	other = {Bomb 20ft},
+	damage dice = Var.,
+	proficiency = T,
+	key ability score = dexterity,
+}
+
+\setWeapon{%
+	ranged II,
+	name = Giavellotto,
+	traits = Thrown,
+	other = {Dart, 30ft},
+	damage dice = 1d6,
+	damage type = P,
+	damage special = \value{MStr},
+	proficiency = T,
+	key ability score = dexterity,
+}
+
+\characterSheet
+
+\clearpage
+\restoregeometry
+
+\begin{multicols*}{2}
+	\maketitle
+	
+	\section*{Anchestry}
+	\paragraph{PF:} 8
+	\paragraph{Size:} M
+	\paragraph{Speed:} 25ft
+	\paragraph{Boost:} Free, Free(For)
+	\paragraph{Flaw:} Wis
+	\paragraph{Linguaggi:} Common, + Int Mod
+	\paragraph{Sensi:}
+	
+	\subsection{Feature }
+
+	
+	\subsection{Heritage — }
+	\paragraph{Feature} 
+	
+	\subsection{Ancestry feat 1 — }
+	\paragraph{Action:} 
+	\paragraph{Frequency:} 
+	\paragraph{Trigger:} 
+	\paragraph{Effect:} 
+	
+	
+	\section*{Background — }
+	\paragraph{Boost:} 
+	\paragraph{Skill:} 
+	\subsection{Skill feat}
+	\paragraph{Prerequites:} 
+	\paragraph{Effect:} 
+
+	
+	\section*{Ability boosts e Skill increase}
+	\subsection*{Ability boost 0 — For, Cos, Int, Sag}
+
+	\subsection*{Skill increase 3 — Crafting}
+	
+	\subsection*{Aility boost 5 — Str, Des, Cos, Int}
+	
+	\subsection*{Skill increase 5 — Survival}
+	
+	
+	\section*{Class 5}
+	\paragraph{PF:} 10 + M.Cos
+	\paragraph{Boost:} 
+	\paragraph{Skill:} 
+	\paragraph{TS:} 
+	\paragraph{Weapons and Armor proficiency:} 
+	
+	\section*{Class features}
+	
+	\section*{Class feats}
+	
+	
+	\section*{Feats:}
+	\subsection*{Skill Feat 2 — }
+	
+	
+\end{multicols*}
+
+\section*{Trait glossary}
+
+\paragraph{agile} Weapon trait.
+\emph{ The multiple attack penalty you take with this weapon on the second attack on your turn is -4 instead of -5, and -8 instead of -10 on the third and subsequent attacks in the turn.}
+
+\paragraph{brawling} Weapon group, critical specialization.
+\emph{The target must succeed at a Fortitude save against your class DC or be slowed 1 until the end of your next turn.}
+
+\paragraph{finesse} Weapon trait.
+\emph{You can use your Dexterity modifier instead of your Strength modifier on attack rolls using this melee weapon. You still use your Strength modifier when calculating damage.}
+
+\paragraph{formulario} Formula Book: A formula book holds the formulas necessary to make items other than the common equipment from this chapter; alchemists typically get one for free. Each formula book can hold the formulas for up to 100 different items. Formulas can also appear on parchment sheets, tablets, and almost any other medium; there’s no need for you to copy them into a specific book as long as you can keep them on hand to reference them.
+
+\paragraph{gather informations} Skill exploration activity: \emph{You use Diplomacy to canvass the area to learn about a specific individual or topic (page 246).}
+
+\paragraph{unarmed} Weapon trait.
+\emph{An unarmed attack uses your body rather than a manufactured weapon. An unarmed attack isn’t a weapon, though it’s categorized with weapons for weapon groups, and it might have weapon traits. Since it’s part of your body, an unarmed attack can’t be Disarmed. It also doesn’t take up a hand, though a fist or other grasping appendage generally works like a free-hand weapon.}
+
+\paragraph{weapon group} A weapon or unarmed attack’s group classifies it with similar weapons. Groups affect some abilities and what the weapon does on a critical hit if you have access to that weapon or unarmed attack’s critical specialization effects; for full details, see page 283. 
+\end{document}
