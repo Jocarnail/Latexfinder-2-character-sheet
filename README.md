@@ -29,3 +29,5 @@ It is possible to utilize the Latexfinder 2 character sheet either as a local pa
 Because the size of the original character sheet is *letterpaper*, the image will fit full page while using letterpaper size pages. 
 
 The project fits A4 paper fine, however, space is left at the bottom of the page, since the proportions of the page are different.
+
+Moreover, a the moment the position of the numbers on the sheet is not identical for different page sizes.
