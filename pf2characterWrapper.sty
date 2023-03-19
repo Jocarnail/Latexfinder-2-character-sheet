@@ -55,6 +55,7 @@
 \newcommand{\ASI}[2]{
     \ifnum \value{#1}<4 {%
         \addtocounter{#1}{1}%
+        \setcounter{#2}{\value{#1}*2+10}%
     }
     \else {%
         \iftoggle{#2}{%
